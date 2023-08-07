@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="NoticeMapper">
+<!-- type에는 NoticeVO의 경로를 적고 resultMap태그는 여러개가 있을 수 있으니 id값으로 구분해줌 -->
+<!-- 왜 힘들게 resultMap을 써야하는가? -->
+<!-- 	ㄴ VO클래스의 필드명과 DB의 컬럼명이 달라서 매핑해줘야함 -->
+<!-- PK에 해당하는 컬럼은 id 태그로, 그 외 나머지는 result 태그로 매핑해줌 -->
+	<resultMap type="com.kh.notice.model.vo.Notice" id="noticeResultMap">
+		<id property="noticeNo" column="NOTICE_NO"/>
+		<result property="noticeSubject" column="NOTICE_SUBJECT"/>
+		<result property="noticeContent" column="NOTICE_CONTENT"/>
+		<result property="noticeWriter" column="NOTICE_WRITER"/>
+		<result property="noticeDate" column="NOTICE_DATE"/>
+		<result property="updateDate" column="UPDATE_DATE"/>
+		<result property="viewCount" column="VIEW_COUNT"/>
+	</resultMap>
+
+<!-- 	mapper.xml에서 쿼리문 안에 #{}를 이용하여 VO클래스의 필드값을 쓰면 getter() 메소드가 동작함 -->
+	<insert id="insertNotice">
+		INSERT INTO NOTICE_TBL VALUES(SEQ_NOTICENO.NEXTVAL, #{ noticeSubject }, #{ noticeContent }, 'admin', DEFAULT, DEFAULT, DEFAULT)
+	</insert>
+	
+	<update id="updateNotice">
+		UPDATE NOTICE_TBL SET NOTICE_SUBJECT = #{ noticeSubject }, NOTICE_CONTENT = #{ noticeContent } WHERE NOTICE_NO = #{ noticeNo }
+	</update>
+	
+	<delete id="deleteNotice">
+		DELETE FROM NOTICE_TBL WHERE NOTICE_NO = #{ noticeNo }
+	</delete>
+	
+	<select id="selectNoticeList" resultMap="noticeResultMap">
+		SELECT * FROM NOTICE_TBL ORDER BY NOTICE_NO DESC
+	</select>
+	
+	<select id="selectOneByNo" resultMap="noticeResultMap">
+		SELECT * FROM NOTICE_TBL WHERE NOTICE_NO = #{ noticeNo }
+	</select>
+	
+<!-- 	결과값을 값이 아닌 숫자로 받아오면 resultMap이 아닌 resultType으로 int형임을 알려준다. -->
+	<select id="getTotalCount" resultType="_int">
+		SELECT COUNT(*) FROM NOTICE_TBL
+	</select>
+</mapper>
